@@ -1,4 +1,5 @@
 {
     "arp_scanner_interval": 10,
-    "network_prefix": "192.168.0"
+    "network_prefix": "192.168.0",
+    "trusted_macs": ["test"]
 }

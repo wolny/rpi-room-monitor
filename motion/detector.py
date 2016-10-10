@@ -46,7 +46,7 @@ class MotionDetector:
 
     def is_motion_detected(self):
         with self.lock:
-            return len(self.frames) != 0
+            return len(self.frames) > 0
 
     def captured_frames(self):
         with self.lock:
