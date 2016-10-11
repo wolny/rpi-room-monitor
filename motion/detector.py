@@ -34,7 +34,6 @@ class MotionDetector:
 
                         if self.avg_frame is None:
                             self.avg_frame = gray_frame.copy().astype('float')
-                            output.truncate(0)
                             continue
 
                         delta_frame = cv2.absdiff(gray_frame, cv2.convertScaleAbs(self.avg_frame))
@@ -53,6 +52,8 @@ class MotionDetector:
                                 self.frames.append(frame)
                     except:
                         print("Unexpected error:", sys.exc_info()[0])
+                    finally:
+                        output.truncate(0)
 
     def is_motion_detected(self):
         with self.lock:
