@@ -4,5 +4,7 @@
     "network_prefix": "192.168.0",
     "trusted_macs": ["test"],
     "resolution": [800, 600],
-    "framerate": 16
+    "framerate": 16,
+    "flickr_api_key": "<api-key>",
+    "flickr_api_secret": "<api-secret>"
 }
