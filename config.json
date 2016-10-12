@@ -1,5 +1,8 @@
 {
     "arp_scanner_interval": 10,
+    "state_check_interval": 4,
     "network_prefix": "192.168.0",
-    "trusted_macs": ["test"]
+    "trusted_macs": ["test"],
+    "resolution": [800, 600],
+    "framerate": 16
 }

@@ -8,7 +8,7 @@ import cv2
 
 
 class MotionDetector:
-    def __init__(self, min_contour_area=6000, resolution=(640, 480), framerate=16, delta_threshold=10):
+    def __init__(self, resolution=(640, 480), framerate=16, min_contour_area=6000, delta_threshold=10):
         self.min_contour_area = min_contour_area
         self.resolution = resolution
         self.framerate = framerate
@@ -48,7 +48,7 @@ class MotionDetector:
                         if len(significant_contours) > 0:
                             print('Motion detected. Saving frame...')
                             with self.lock:
-                                # todo: potential mem leak
+                                # todo: potential mem leak, use circular frame buffer
                                 self.frames.append(frame)
                     except Exception:
                         print(traceback.format_exc())
