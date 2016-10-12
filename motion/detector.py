@@ -41,8 +41,8 @@ class MotionDetector:
 
                         thresh_frame = cv2.threshold(delta_frame, self.delta_threshold, 255, cv2.THRESH_BINARY)[1]
                         thresh_frame = cv2.dilate(thresh_frame, None, iterations=2)
-                        (contours, _) = cv2.findContours(thresh_frame.copy(), cv2.RETR_EXTERNAL,
-                                                         cv2.CHAIN_APPROX_SIMPLE)
+                        (_, contours, _) = cv2.findContours(thresh_frame.copy(), cv2.RETR_EXTERNAL,
+                                                            cv2.CHAIN_APPROX_SIMPLE)
 
                         significant_contours = list(filter(self.is_significant, contours))
                         if len(significant_contours) > 0:
