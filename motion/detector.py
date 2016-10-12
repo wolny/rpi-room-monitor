@@ -1,6 +1,6 @@
 import threading
-import sys
 import time
+import traceback
 
 import picamera
 import picamera.array
@@ -50,8 +50,8 @@ class MotionDetector:
                             with self.lock:
                                 # todo: potential mem leak
                                 self.frames.append(frame)
-                    except:
-                        print("Unexpected error:", sys.exc_info()[0])
+                    except Exception:
+                        print(traceback.format_exc())
                     finally:
                         output.truncate(0)
 
