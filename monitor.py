@@ -40,7 +40,8 @@ while True:
     current_macs = scanner.mac_addresses()
     trusted_device_present = len(trusted_macs.intersection(current_macs)) > 0
     motion_detected = detector.is_motion_detected()
-    if not trusted_device_present and motion_detected:
+    if motion_detected:
         frames = detector.captured_frames()
-        frameproc.FrameProcessor(frames, ftp_client, flickr)
+        if not trusted_device_present:
+            frameproc.FrameProcessor(frames, ftp_client, flickr)
     time.sleep(config['state_check_interval'])
