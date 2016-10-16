@@ -8,7 +8,7 @@ import picamera.array
 
 
 class MotionDetector:
-    def __init__(self, resolution=(800, 600), framerate=16, min_contour_area=10000, delta_threshold=15):
+    def __init__(self, resolution=(800, 600), framerate=16, min_contour_area=6000, delta_threshold=15):
         self.min_contour_area = min_contour_area
         self.resolution = resolution
         self.framerate = framerate
