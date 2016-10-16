@@ -1,12 +1,12 @@
 import argparse
 import json
 import time
-from ftplib import FTP
 
 import flickrapi
 
 import arpscanner.scanner as arpscanner
 import frameprocessor.processor as frameproc
+import ftp.ftp_client as ftp
 import motion.detector as motion
 
 parser = argparse.ArgumentParser(description='Find intruders in my room')
@@ -25,16 +25,13 @@ resolution = tuple(config['resolution'])
 framerate = config['framerate']
 detector = motion.MotionDetector(resolution, framerate)
 
-ftp = None
+ftp_client = None
 if config['ftp_enabled']:
-    ftp = FTP(config['ftp_host'], user=config['ftp_user'], passwd=config['ftp_passwd'])
-    ftp.cwd(config['ftp_dir'])
+    ftp_client = ftp.FtpClient(config['ftp_host'], config['ftp_user'], config['ftp_passwd'], config['ftp_dir'])
 
 flickr = None
 if config['flickr_enabled']:
     flickr = flickrapi.FlickrAPI(config['flickr_api_key'], config['flickr_api_secret'])
-
-frame_processor = frameproc.FrameProcessor(ftp, flickr)
 
 # warm up
 time.sleep(arp_interval)
@@ -44,7 +41,6 @@ while True:
     trusted_device_present = len(trusted_macs.intersection(current_macs)) > 0
     motion_detected = detector.is_motion_detected()
     if not trusted_device_present and motion_detected:
-        frame_processor.process(detector.captured_frames())
+        frames = detector.captured_frames()
+        frameproc.FrameProcessor(frames, ftp_client, flickr)
     time.sleep(config['state_check_interval'])
-
-

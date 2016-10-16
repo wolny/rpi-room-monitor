@@ -1,17 +1,23 @@
 import random
+import threading
 import time
 
 import cv2
 
 
 class FrameProcessor:
-    def __init__(self, ftp=None, flickr=None):
-        self.ftp = ftp
+    def __init__(self, frames, ftp_client=None, flickr=None):
+        self.tmp_dir = '/tmp/'
+        self.frames = frames
+        self.ftp_client = ftp_client
         self.flickr = flickr
+        self.task = threading.Thread(target=self.process)
+        self.task.daemon = True
+        self.task.start()
 
-    def process(self, frames):
-        if frames:
-            files = self.save_tmp(frames)
+    def process(self):
+        if self.frames:
+            files = self.save_tmp(self.frames)
             self.upload_ftp(files)
             # pick random image and upload to flickr
             filename = random.choice(files)
@@ -21,22 +27,23 @@ class FrameProcessor:
 
     def upload_flickr(self, filename):
         if self.flickr is not None:
-            res = self.flickr.upload(filename, open(filename, 'rb'))
+            res = self.flickr.upload(filename, open(self.tmp_dir + filename, 'rb'))
             status = res.attrib['stat']
             print('Flickr upload: %s. Status %s' % (filename, status))
 
     def upload_ftp(self, files):
-        if self.ftp is not None:
+        if self.ftp_client is not None:
+            ftp = self.ftp_client.session()
             for filename in files:
-                rsp_code = self.ftp.storbinary("STOR " + filename, open(filename, 'rb'))
+                rsp_code = ftp.storbinary("STOR " + filename, open(self.tmp_dir + filename, 'rb'))
                 print('FTP upload %s. Response code: %s' %(filename, rsp_code))
 
     def save_tmp(self, frames):
-        print('Saving %d images to /tmp' % len(frames))
+        print('Saving %d images to %s' % (len(frames), self.tmp_dir))
         ts = time.strftime("%Y%m%d%H%M%S")
         files = []
         for i, frame in enumerate(frames):
-            filename = '/tmp/motion-%s-%02d.jpg' % (ts, i)
+            filename = 'motion-%s-%02d.jpg' % (ts, i)
             files.append(filename)
-            cv2.imwrite(filename, frame)
+            cv2.imwrite(self.tmp_dir + filename, frame)
         return files

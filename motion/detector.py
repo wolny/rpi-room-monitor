@@ -8,7 +8,7 @@ import picamera.array
 
 
 class MotionDetector:
-    def __init__(self, resolution=(800, 600), framerate=16, min_contour_area=6000, delta_threshold=20):
+    def __init__(self, resolution=(800, 600), framerate=16, min_contour_area=10000, delta_threshold=15):
         self.min_contour_area = min_contour_area
         self.resolution = resolution
         self.framerate = framerate
@@ -19,11 +19,6 @@ class MotionDetector:
         self.task = threading.Thread(target=self.detect_motion)
         self.task.daemon = True
         self.task.start()
-
-    def is_significant(self, contour):
-        area = cv2.contourArea(contour)
-        print('Contour area', area)
-        return area > self.min_contour_area
 
     def detect_motion(self):
         with picamera.PiCamera(resolution=self.resolution, framerate=self.framerate) as camera:
@@ -57,6 +52,13 @@ class MotionDetector:
                         print(traceback.format_exc())
                     finally:
                         output.truncate(0)
+
+    def is_significant(self, contour):
+        area = cv2.contourArea(contour)
+        result = area > self.min_contour_area
+        if result:
+            print('Contour area', area)
+        return result
 
     def is_motion_detected(self):
         with self.lock:
