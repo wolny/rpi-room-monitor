@@ -1,0 +1,21 @@
+{
+  "arp_scanner_interval": 10,
+  "state_check_interval": 4,
+  "network_prefix": "192.168.0",
+  "trusted_macs": [
+    "test"
+  ],
+  "resolution": [
+    800,
+    600
+  ],
+  "framerate": 16,
+  "flickr_enabled": true,
+  "flickr_api_key": "FLICKR_API_KEY",
+  "flickr_api_secret": "FLICKR_API_SECRET",
+  "ftp_enabled": true,
+  "ftp_host": "FTP_HOST",
+  "ftp_user": "FTP_USER",
+  "ftp_passwd": "FTP_PASSWD",
+  "ftp_dir": "FTP_DIR"
+}

@@ -1,9 +1,13 @@
 import argparse
 import json
 import time
+from ftplib import FTP
+
+import flickrapi
+
 import arpscanner.scanner as arpscanner
-import motion.detector as motion
 import frameprocessor.processor as frameproc
+import motion.detector as motion
 
 parser = argparse.ArgumentParser(description='Find intruders in my room')
 parser.add_argument("-c", help="JSON config file")
@@ -21,7 +25,16 @@ resolution = tuple(config['resolution'])
 framerate = config['framerate']
 detector = motion.MotionDetector(resolution, framerate)
 
-frame_processor = frameproc.FrameProcessor()
+ftp = None
+if config['ftp_enabled']:
+    ftp = FTP(config['ftp_host'], user=config['ftp_user'], passwd=config['ftp_passwd'])
+    ftp.cwd(config['ftp_dir'])
+
+flickr = None
+if config['flickr_enabled']:
+    flickr = flickrapi.FlickrAPI(config['flickr_api_key'], config['flickr_api_secret'])
+
+frame_processor = frameproc.FrameProcessor(ftp, flickr)
 
 # warm up
 time.sleep(arp_interval)

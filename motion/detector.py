@@ -2,13 +2,13 @@ import threading
 import time
 import traceback
 
+import cv2
 import picamera
 import picamera.array
-import cv2
 
 
 class MotionDetector:
-    def __init__(self, resolution=(640, 480), framerate=16, min_contour_area=6000, delta_threshold=10):
+    def __init__(self, resolution=(800, 600), framerate=16, min_contour_area=6000, delta_threshold=20):
         self.min_contour_area = min_contour_area
         self.resolution = resolution
         self.framerate = framerate
@@ -17,10 +17,13 @@ class MotionDetector:
         self.avg_frame = None
         self.lock = threading.RLock()
         self.task = threading.Thread(target=self.detect_motion)
+        self.task.daemon = True
         self.task.start()
 
     def is_significant(self, contour):
-        return cv2.contourArea(contour) > self.min_contour_area
+        area = cv2.contourArea(contour)
+        print('Contour area', area)
+        return area > self.min_contour_area
 
     def detect_motion(self):
         with picamera.PiCamera(resolution=self.resolution, framerate=self.framerate) as camera:
@@ -29,15 +32,15 @@ class MotionDetector:
                 for rgb_frame in camera.capture_continuous(output, format='rgb', use_video_port=True):
                     try:
                         frame = rgb_frame.array
-                        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                        gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
+                        gray_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+                        smooth_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
 
                         if self.avg_frame is None:
-                            self.avg_frame = gray_frame.copy().astype('float')
+                            self.avg_frame = smooth_frame.copy().astype('float')
                             continue
 
-                        delta_frame = cv2.absdiff(gray_frame, cv2.convertScaleAbs(self.avg_frame))
-                        cv2.accumulateWeighted(gray_frame, self.avg_frame, 0.5)
+                        cv2.accumulateWeighted(smooth_frame, self.avg_frame, 0.5)
+                        delta_frame = cv2.absdiff(smooth_frame, cv2.convertScaleAbs(self.avg_frame))
 
                         thresh_frame = cv2.threshold(delta_frame, self.delta_threshold, 255, cv2.THRESH_BINARY)[1]
                         thresh_frame = cv2.dilate(thresh_frame, None, iterations=2)

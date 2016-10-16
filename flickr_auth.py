@@ -1,6 +1,7 @@
 import argparse
 import json
 import webbrowser
+
 import flickrapi
 
 parser = argparse.ArgumentParser(description='Authenticate with flickr')
@@ -13,7 +14,7 @@ with open(args.c) as config_file:
 api_key = config['flickr_api_key']
 api_secret = config['flickr_api_secret']
 
-flickr = flickrapi.FlickrAPI(api_key, api_secret, format='parsed-json')
+flickr = flickrapi.FlickrAPI(api_key, api_secret)
 
 print('Step 1: authenticate')
 
@@ -34,8 +35,3 @@ if not flickr.token_valid(perms='write'):
 
     # Trade the request token for an access token
     flickr.get_access_token(verifier)
-
-print('Step 2: get my photosets')
-
-sets = flickr.photosets.getList()
-print(sets)

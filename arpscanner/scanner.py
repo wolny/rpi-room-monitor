@@ -1,7 +1,7 @@
 import subprocess
+import sys
 import threading
 import time
-import sys
 
 
 class ArpScanner:
@@ -19,6 +19,7 @@ class ArpScanner:
         self.macs = set()
         self.lock = threading.RLock()
         self.task = threading.Thread(target=self.scan)
+        self.task.daemon = True
         self.task.start()
 
 
