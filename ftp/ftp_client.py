@@ -2,7 +2,7 @@ from ftplib import FTP
 
 
 class FtpClient:
-    def __init__(self, host, user, passwd, dir):
+    def __init__(self, host, user, passwd, dir=None):
         self.host = host
         self.user = user
         self.passwd = passwd
@@ -10,5 +10,6 @@ class FtpClient:
 
     def session(self):
         ftp = FTP(self.host, user=self.user, passwd=self.passwd)
-        ftp.cwd(self.dir)
+        if dir:
+            ftp.cwd(self.dir)
         return ftp

@@ -27,7 +27,7 @@ detector = motion.MotionDetector(resolution, framerate)
 
 ftp_client = None
 if config['ftp_enabled']:
-    ftp_client = ftp.FtpClient(config['ftp_host'], config['ftp_user'], config['ftp_passwd'], config['ftp_dir'])
+    ftp_client = ftp.FtpClient(config['ftp_host'], config['ftp_user'], config['ftp_passwd'], config.get('ftp_dir'))
 
 flickr = None
 if config['flickr_enabled']:

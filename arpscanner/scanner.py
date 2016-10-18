@@ -7,7 +7,7 @@ import time
 class ArpScanner:
     """
     Simple scanner which broadcasts ARP packets on the local network and returns a list of discovered MAC addresses.
-    Requires arp-scanner to be installed, e.g. Ubuntu/Debian: 'sudo apt-get install arp-scanner'
+    Requires arp-scanner to be installed, e.g. Ubuntu/Debian: 'sudo apt-get install arp-scan'
     apr-scanner needs to be run as root, so add the following line to you sudoers file (visudo):
     myuser ALL = (root) NOPASSWD: /usr/bin/arp-scan
     """
