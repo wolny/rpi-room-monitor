@@ -38,7 +38,7 @@ class FrameProcessor:
             ftp = self.ftp_client.session()
             for filename in files:
                 rsp_code = ftp.storbinary("STOR " + filename, open(self.tmp_dir + filename, 'rb'))
-                self.logger.info('FTP upload %s. Response code: %s' %(filename, rsp_code))
+                self.logger.info('FTP upload %s. Response code: %s' % (filename, rsp_code))
 
     def save_tmp(self, frames):
         self.logger.debug('Saving %d images to %s' % (len(frames), self.tmp_dir))

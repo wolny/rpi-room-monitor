@@ -26,7 +26,7 @@ args = parser.parse_args()
 with open(args.c) as config_file:
     config = json.load(config_file)
 
-logger.info('Config: ', config)
+logger.info('Config: %s' % config)
 trusted_macs = set(config['trusted_macs'])
 arp_interval = config['arp_scanner_interval']
 scanner = arpscanner.ArpScanner(config['network_prefix'], arp_interval, logger=logger)

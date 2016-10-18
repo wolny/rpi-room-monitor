@@ -58,7 +58,7 @@ class MotionDetector:
         area = cv2.contourArea(contour)
         result = area > self.min_contour_area
         if result:
-            self.logger.debug('Contour area', area)
+            self.logger.debug('Contour area %f' % area)
         return result
 
     def is_motion_detected(self):
