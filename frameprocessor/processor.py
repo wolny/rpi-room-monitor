@@ -1,3 +1,4 @@
+import logging
 import random
 import threading
 import time
@@ -6,7 +7,8 @@ import cv2
 
 
 class FrameProcessor:
-    def __init__(self, frames, ftp_client=None, flickr=None):
+    def __init__(self, frames, ftp_client=None, flickr=None, logger=None):
+        self.logger = logger or logging.getLogger()
         self.tmp_dir = '/tmp/'
         self.frames = frames
         self.ftp_client = ftp_client
@@ -23,23 +25,23 @@ class FrameProcessor:
             filename = random.choice(files)
             self.upload_flickr(filename)
         else:
-            print('Noting to save')
+            self.logger.debug('Noting to save')
 
     def upload_flickr(self, filename):
         if self.flickr is not None:
             res = self.flickr.upload(filename, open(self.tmp_dir + filename, 'rb'))
             status = res.attrib['stat']
-            print('Flickr upload: %s. Status %s' % (filename, status))
+            self.logger.info('Flickr upload: %s. Status %s' % (filename, status))
 
     def upload_ftp(self, files):
         if self.ftp_client is not None:
             ftp = self.ftp_client.session()
             for filename in files:
                 rsp_code = ftp.storbinary("STOR " + filename, open(self.tmp_dir + filename, 'rb'))
-                print('FTP upload %s. Response code: %s' %(filename, rsp_code))
+                self.logger.info('FTP upload %s. Response code: %s' %(filename, rsp_code))
 
     def save_tmp(self, frames):
-        print('Saving %d images to %s' % (len(frames), self.tmp_dir))
+        self.logger.debug('Saving %d images to %s' % (len(frames), self.tmp_dir))
         ts = time.strftime("%Y%m%d%H%M%S")
         files = []
         for i, frame in enumerate(frames):

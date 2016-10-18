@@ -1,6 +1,6 @@
+import logging
 import threading
 import time
-import traceback
 
 import cv2
 import picamera
@@ -8,7 +8,8 @@ import picamera.array
 
 
 class MotionDetector:
-    def __init__(self, resolution=(800, 600), framerate=16, min_contour_area=6000, delta_threshold=15):
+    def __init__(self, resolution=(800, 600), framerate=16, min_contour_area=6000, delta_threshold=15, logger=None):
+        self.logger = logger or logging.getLogger()
         self.min_contour_area = min_contour_area
         self.resolution = resolution
         self.framerate = framerate
@@ -44,12 +45,12 @@ class MotionDetector:
 
                         significant_contours = list(filter(self.is_significant, contours))
                         if len(significant_contours) > 0:
-                            print('Motion detected. Saving frame...')
+                            self.logger.debug('Motion detected. Saving frame...')
                             with self.lock:
                                 # todo: potential mem leak, use circular frame buffer
                                 self.frames.append(frame)
                     except Exception:
-                        print(traceback.format_exc())
+                        self.logger.error('Motion detection error', exc_info=True)
                     finally:
                         output.truncate(0)
 
@@ -57,7 +58,7 @@ class MotionDetector:
         area = cv2.contourArea(contour)
         result = area > self.min_contour_area
         if result:
-            print('Contour area', area)
+            self.logger.debug('Contour area', area)
         return result
 
     def is_motion_detected(self):

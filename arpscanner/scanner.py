@@ -1,5 +1,5 @@
+import logging
 import subprocess
-import sys
 import threading
 import time
 
@@ -13,7 +13,8 @@ class ArpScanner:
     """
     CMD = 'sudo arp-scan -l'
 
-    def __init__(self, net_prefix, interval=10):
+    def __init__(self, net_prefix, interval=10, logger=None):
+        self.logger = logger or logging.getLogger()
         self.prefix = net_prefix.encode()
         self.interval = interval
         self.macs = set()
@@ -21,7 +22,6 @@ class ArpScanner:
         self.task = threading.Thread(target=self.scan)
         self.task.daemon = True
         self.task.start()
-
 
     def run_arp_scan(self):
         p = subprocess.Popen(ArpScanner.CMD.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -41,7 +41,7 @@ class ArpScanner:
                     self.macs = results
                 time.sleep(self.interval)
             except:
-                print("Unexpected error:", sys.exc_info()[0])
+                self.logger.error('Unexpected error', exc_info=True)
 
     def mac_addresses(self):
         with self.lock:
