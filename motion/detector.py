@@ -7,8 +7,9 @@ import picamera
 import picamera.array
 
 
-class MotionDetector:
+class MotionDetector(threading.Thread):
     def __init__(self, resolution=(800, 600), framerate=16, min_contour_area=6000, delta_threshold=15, logger=None):
+        super().__init__()
         self.logger = logger or logging.getLogger()
         self.min_contour_area = min_contour_area
         self.resolution = resolution
@@ -17,11 +18,9 @@ class MotionDetector:
         self.frames = []
         self.avg_frame = None
         self.lock = threading.RLock()
-        self.task = threading.Thread(target=self.detect_motion)
-        self.task.daemon = True
-        self.task.start()
+        self.daemon = True
 
-    def detect_motion(self):
+    def run(self):
         with picamera.PiCamera(resolution=self.resolution, framerate=self.framerate) as camera:
             with picamera.array.PiRGBArray(camera) as output:
                 time.sleep(3)

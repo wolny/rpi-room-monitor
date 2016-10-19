@@ -4,7 +4,7 @@ import threading
 import time
 
 
-class ArpScanner:
+class ArpScanner(threading.Thread):
     """
     Simple scanner which broadcasts ARP packets on the local network and returns a list of discovered MAC addresses.
     Requires arp-scanner to be installed, e.g. Ubuntu/Debian: 'sudo apt-get install arp-scan'
@@ -14,16 +14,15 @@ class ArpScanner:
     CMD = 'sudo arp-scan -l'
 
     def __init__(self, net_prefix, interval=10, logger=None):
+        super().__init__()
+        self.daemon = True
         self.logger = logger or logging.getLogger()
         self.prefix = net_prefix.encode()
         self.interval = interval
         self.macs = set()
         self.lock = threading.RLock()
-        self.task = threading.Thread(target=self.scan)
-        self.task.daemon = True
-        self.task.start()
 
-    def run_arp_scan(self):
+    def run(self):
         p = subprocess.Popen(ArpScanner.CMD.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         return iter(p.stdout.readline, b'')
 
@@ -37,6 +36,7 @@ class ArpScanner:
         while True:
             try:
                 results = set(map(self.line_to_mac, filter(self.is_host, self.run_arp_scan())))
+                self.logger.debug('Discovered MACs: %s' % results)
                 with self.lock:
                     self.macs = results
                 time.sleep(self.interval)

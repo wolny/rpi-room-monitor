@@ -3,11 +3,8 @@ import json
 import logging
 import time
 
-import flickrapi
-
 import arpscanner.scanner as arpscanner
 import frameprocessor.processor as frameproc
-import ftp.ftp_client as ftp
 import motion.detector as motion
 
 # configure logger
@@ -27,31 +24,29 @@ with open(args.c) as config_file:
     config = json.load(config_file)
 
 logger.info('Config: %s' % config)
-trusted_macs = set(config['trusted_macs'])
-arp_interval = config['arp_scanner_interval']
-scanner = arpscanner.ArpScanner(config['network_prefix'], arp_interval, logger=logger)
 
+# start arp-scanner
+arp_interval = config['arp_scanner_interval']
+network_prefix = config['network_prefix']
+scanner = arpscanner.ArpScanner(network_prefix, arp_interval, logger=logger)
+scanner.start()
+
+# start motion detector
 resolution = tuple(config['resolution'])
 framerate = config['framerate']
 detector = motion.MotionDetector(resolution, framerate, logger=logger)
+detector.start()
 
-ftp_client = None
-if config['ftp_enabled']:
-    ftp_client = ftp.FtpClient(config['ftp_host'], config['ftp_user'], config['ftp_passwd'], config.get('ftp_dir'))
+# create frame processor
+frame_processor = frameproc.FrameProcessor(config, logger)
 
-flickr = None
-if config['flickr_enabled']:
-    flickr = flickrapi.FlickrAPI(config['flickr_api_key'], config['flickr_api_secret'])
-
-# warm up
-time.sleep(arp_interval)
-
+trusted_macs = set(config['trusted_macs'])
 while True:
     current_macs = scanner.mac_addresses()
     trusted_device_present = len(trusted_macs.intersection(current_macs)) > 0
     motion_detected = detector.is_motion_detected()
     if motion_detected:
         frames = detector.captured_frames()
-        if not trusted_device_present:
-            frameproc.FrameProcessor(frames, ftp_client, flickr, logger=logger)
+        frame_processor.process(frames, trusted_device_present)
+
     time.sleep(config['state_check_interval'])

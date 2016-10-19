@@ -20,6 +20,8 @@ On your Raspberry Pi:
 - get the [Flickr API key](https://www.flickr.com/services/apps/create/)
 - `python3 flickr_auth.py -c config.json` in order to [authenticate with flickr](https://stuvel.eu/flickrapi-doc/3-auth.html#authenticating-without-local-web-server); needs to be run from the terminal within the X-server, since the Pi's default web browser will be opened
 - run the app: `python3 monitor.py -c config.json`
+- `sudo mv delete_old_frames.sh /etc/cron.daily/`; all the frames on which the motion was detected will be kept in `/tmp` dir, this script cleans it up (by default removes images older than 4 days)
+
 
 ## Configuration
 Sample `config.json`:
