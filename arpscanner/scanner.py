@@ -23,16 +23,6 @@ class ArpScanner(threading.Thread):
         self.lock = threading.RLock()
 
     def run(self):
-        p = subprocess.Popen(ArpScanner.CMD.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        return iter(p.stdout.readline, b'')
-
-    def is_host(self, line):
-        return line.startswith(self.prefix)
-
-    def line_to_mac(self, line):
-        return line.split()[1].decode()
-
-    def scan(self):
         while True:
             try:
                 results = set(map(self.line_to_mac, filter(self.is_host, self.run_arp_scan())))
@@ -42,6 +32,16 @@ class ArpScanner(threading.Thread):
                 time.sleep(self.interval)
             except:
                 self.logger.error('Unexpected error', exc_info=True)
+                
+    def run_arp_scan(self):
+        p = subprocess.Popen(ArpScanner.CMD.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        return iter(p.stdout.readline, b'')
+
+    def is_host(self, line):
+        return line.startswith(self.prefix)
+
+    def line_to_mac(self, line):
+        return line.split()[1].decode()
 
     def mac_addresses(self):
         with self.lock:
