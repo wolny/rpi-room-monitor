@@ -6,7 +6,7 @@ import time
 import arpscanner.scanner as arpscanner
 import frameprocessor.processor as frameproc
 import motion.detector as motion
-from influxdb.counter import Counter
+from counter.counter import Counter
 
 # configure logger
 logger = logging.getLogger()
