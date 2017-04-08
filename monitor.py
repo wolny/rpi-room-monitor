@@ -42,11 +42,14 @@ frame_processor = frameproc.FrameProcessor(config, logger)
 
 trusted_macs = set(config['trusted_macs'])
 while True:
-    current_macs = scanner.mac_addresses()
-    trusted_device_present = len(trusted_macs.intersection(current_macs)) > 0
-    motion_detected = detector.is_motion_detected()
-    if motion_detected:
-        frames = detector.captured_frames()
-        frame_processor.process(frames, trusted_device_present)
+    try:
+        current_macs = scanner.mac_addresses()
+        trusted_device_present = len(trusted_macs.intersection(current_macs)) > 0
+        motion_detected = detector.is_motion_detected()
+        if motion_detected:
+            frames = detector.captured_frames()
+            frame_processor.process(frames, trusted_device_present)
 
-    time.sleep(config['state_check_interval'])
+        time.sleep(config['state_check_interval'])
+    except:
+        self.logger.error('Unexpected error in the main processing loop', exc_info=True)

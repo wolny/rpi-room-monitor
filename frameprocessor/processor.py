@@ -29,8 +29,8 @@ class FrameProcessor:
 
             # upload only if no trusted devices are present
             if not trusted_device_present:
-                self.upload_ftp(files)
                 self.upload_flickr(files)
+                self.upload_ftp(files)
         else:
             self.logger.debug('Noting to save')
 
