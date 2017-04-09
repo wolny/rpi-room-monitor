@@ -6,7 +6,6 @@ import time
 import arpscanner.scanner as arpscanner
 import frameprocessor.processor as frameproc
 import motion.detector as motion
-from influxdb.counter import Counter
 
 # configure logger
 logger = logging.getLogger()
@@ -14,7 +13,7 @@ handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s %(name)-10s %(levelname)-8s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 # parse config
 parser = argparse.ArgumentParser(description='Find intruders in my room')
@@ -38,10 +37,8 @@ framerate = config['framerate']
 detector = motion.MotionDetector(resolution, framerate, logger=logger)
 detector.start()
 
-# create influxdb client
-counter = Counter('192.168.0.16', 8086, 'pimonitor')
 # create frame processor
-frame_processor = frameproc.FrameProcessor(config, counter, logger)
+frame_processor = frameproc.FrameProcessor(config, logger)
 
 trusted_macs = set(config['trusted_macs'])
 while True:
