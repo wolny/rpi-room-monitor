@@ -1,6 +1,5 @@
 from influxdb import InfluxDBClient
 
-
 class Counter:
     def __init__(self, host, port, dbname):
         self.client = InfluxDBClient(host=host, port=port, database=dbname)
