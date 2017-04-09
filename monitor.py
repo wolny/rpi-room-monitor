@@ -39,7 +39,7 @@ detector = motion.MotionDetector(resolution, framerate, logger=logger)
 detector.start()
 
 # create influxdb client
-counter = Counter(config['influxdb_host'], config['influxdb_port'], config['influxdb_db'])
+counter = Counter('192.168.0.16', 8086, 'pimonitor')
 # create frame processor
 frame_processor = frameproc.FrameProcessor(config, counter, logger)
 
