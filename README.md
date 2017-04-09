@@ -16,6 +16,7 @@ Motion detection module inspired by [this great post](http://www.pyimagesearch.c
 On your Raspberry Pi:
 - `sudo apt-get install arp-scan`; `arp-scan` needs to be needs to be run as root in order to open a link-layer socket so one might add `myuser ALL = (root) NOPASSWD: /usr/bin/arp-scan` to the sudoers file
 - `sudo pip3 install flickrapi`
+- `sudo apt-get install python-influxdb`
 - [install OpenCV](http://www.pyimagesearch.com/2015/07/20/install-opencv-3-0-and-python-3-4-on-ubuntu/)
 - get the [Flickr API key](https://www.flickr.com/services/apps/create/)
 - `python3 flickr_auth.py -c config.json` in order to [authenticate with flickr](https://stuvel.eu/flickrapi-doc/3-auth.html#authenticating-without-local-web-server); needs to be run from the terminal within the X-server, since the Pi's default web browser will be opened

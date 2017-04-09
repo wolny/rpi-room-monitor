@@ -12,8 +12,9 @@ from ftp.ftp_uploader import FtpUploader
 class FrameProcessor:
     TMP_DIR = '/tmp/'
 
-    def __init__(self, config, logger=None):
+    def __init__(self, config, counter, logger=None):
         self.config = config
+        self.counter = counter
         self.logger = logger or logging.getLogger()
 
         self.flickr = None
@@ -51,9 +52,11 @@ class FrameProcessor:
             passwd = self.config['ftp_passwd']
             ftp_dir = self.config.get('ftp_dir')
             FtpUploader(files, host, user, passwd, ftp_dir, self.logger).start()
+            self.counter.increment("ftp.uploadedFrames", len(files))
 
     def upload_flickr(self, files):
         if self.flickr:
             # pick random image and upload to flickr
             filename = random.choice(files)
             FlickrUploader(filename, self.flickr, self.logger).start()
+            self.counter.increment("flickr.uploadedFrames", 1)

@@ -6,6 +6,7 @@ import time
 import arpscanner.scanner as arpscanner
 import frameprocessor.processor as frameproc
 import motion.detector as motion
+from counter.counter import Counter
 
 # configure logger
 logger = logging.getLogger()
@@ -37,8 +38,10 @@ framerate = config['framerate']
 detector = motion.MotionDetector(resolution, framerate, logger=logger)
 detector.start()
 
+# create influxdb counter
+counter = Counter(config['influxdb_host'], config['influxdb_port'], config['influxdb_dbname'])
 # create frame processor
-frame_processor = frameproc.FrameProcessor(config, logger)
+frame_processor = frameproc.FrameProcessor(config, counter, logger)
 
 trusted_macs = set(config['trusted_macs'])
 while True:
