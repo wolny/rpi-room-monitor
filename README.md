@@ -23,6 +23,17 @@ On your Raspberry Pi:
 - run the app: `python3 monitor.py -c config.json`
 - `sudo cp delete_old_frames.sh /etc/cron.daily/delete-old-frames`; all the frames on which the motion was detected will be kept in `/tmp` dir, this script cleans it up (by default removes images older than 4 days); make sure that the script in `/etc/cron.daily` doesn't have the `.sh` extension
 
+On a box in your LAN (optional):
+- install FTP server
+- start influxdb + grafana docker containers:
+```
+sudo docker run -d -p 8086:8086 -v influxdb:/var/lib/influxdb influxdb
+sudo docker run -d -p 3000:3000 grafana/grafana
+```
+- create db to be used for collecting measurements:
+```
+curl -i -X POST 'http://localhost:8086/query' --data-urlencode "q=CREATE DATABASE pimonitor"
+```
 
 ## Configuration
 Sample `config.json`:
@@ -46,7 +57,10 @@ Sample `config.json`:
   "ftp_host": "FTP_HOST",
   "ftp_user": "FTP_USER",
   "ftp_passwd": "FTP_PASSWD",
-  "ftp_dir": "FTP_DIR"
+  "ftp_dir": "FTP_DIR",
+  "influxdb_host": "INFLUXDB_HOST",
+  "influxdb_port": "INFLUXDB_PORT",
+  "influxdb_dbname": "INFLUXDB_DBNAME"
 }
 ```
 - `arp_scanner_interval` - number of sec. between each ARP protocol scans used to determine MAC addresses present in the LAN
